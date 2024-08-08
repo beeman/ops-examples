@@ -1,19 +1,6 @@
-terraform {
-  required_providers {
-    hcloud = {
-      source = "hetznercloud/hcloud"
-      version = "1.48.0"
-    }
-  }
-}
-
 provider "hcloud" {
   # Configuration options
   token = var.token
-}
-
-variable "token" {
-  sensitive = true
 }
 
 resource "hcloud_server" "node1" {
