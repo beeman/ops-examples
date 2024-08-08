@@ -1,0 +1,68 @@
+#cloud-config
+system_info:
+  default_user:
+    name: "beeman"
+    primary_group: "beeman"
+    groups: "sudo"
+    shell: "/bin/zsh"
+    ssh_import_id:
+      - gh:beeman
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICSJJXuZstF8he++2K/7XDW5LvNiuN+I2p4xhBjvui6f"
+    lock_passwd: true
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+locale: en_US.UTF-8
+
+users:
+  - default
+
+disable_root: true
+ssh_pwauth: false
+
+write_files:
+  - path: /etc/motd
+    permissions: '0644'
+    content: |
+      Welcome to this server!
+
+      This is just a test.
+
+      Please be careful.
+  - path: /root/install-docker.sh
+    content: |
+      #!/bin/bash
+      echo 'Installing Docker...'
+      curl -fsSL https://get.docker.com | bash -
+      usermod -aG docker beeman
+    permissions: '0755'
+
+runcmd:
+  - [ sh, "/root/install-docker.sh" ]
+  - [ sh, -c, "cp /etc/zsh/newuser.zshrc.recommended /home/beeman/.zshrc" ]
+  - |
+    echo "Generating locale..."
+    echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+    locale-gen en_US.UTF-8 UTF-8
+    update-locale LANG=en_US.UTF-8
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+packages:
+  - git
+  - net-tools
+  - qemu-guest-agent
+  - vim
+  - zsh
+
+apt:
+  clean: true
+  autoremove: true
+  autoclean: true
+  purge: true
+  update_cache: true
+
+power_state:
+  mode: reboot
